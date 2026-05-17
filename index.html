@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTM v20 — Элиас Вейн</title>
+    <style>
+        /* Заменили готический шрифт на пафосный античный Cinzel Decorative */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&family=Philosopher:ital,wght@0,400;0,700;1,400&display=swap');
+
+        :root {
+            --bg-color: #1a1a1a;
+            --paper-color: #2b2b2b;
+            --text-color: #d4c4a8;
+            --heading-color: #c0392b;
+            --gold-color: #bfa35f;
+            --border-color: #5e0a0a;
+            --dark-red: #3d0c0c;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23222' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text-color);
+            font-family: 'Philosopher', Georgia, serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background-color: var(--paper-color);
+            border-left: 2px solid var(--dark-red);
+            border-right: 2px solid var(--dark-red);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        /* HEADER */
+        .header {
+            position: relative;
+            border-bottom: 4px double var(--gold-color);
+            padding: 40px 20px;
+            text-align: center;
+            background-color: #000;
+            overflow: hidden;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 0;
+            filter: grayscale(50%) contrast(120%);
+            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            text-shadow: 3px 3px 6px #000;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 40px 20px 0;
+        }
+
+        h1 {
+            font-family: 'Cinzel Decorative', serif; /* Новый шрифт */
+            font-size: 4rem;
+            color: var(--heading-color);
+            margin: 0;
+            letter-spacing: 6px; /* Увеличенные интервалы для пафоса */
+            text-transform: uppercase; /* Все буквы заглавные */
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-family: 'Cinzel', serif;
+            color: var(--gold-color);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 10px;
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .stat-box {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--gold-color);
+            padding: 5px 15px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+        }
+
+        .stat-box span {
+            color: var(--heading-color);
+            font-weight: bold;
+        }
+
+        /* NAVIGATION TABS */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background-color: var(--dark-red);
+            border-bottom: 1px solid var(--gold-color);
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            background: rgba(192, 57, 43, 0.4);
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            background: var(--paper-color);
+            color: var(--gold-color);
+        }
+
+        /* TWO-COLUMN LAYOUT */
+        .content-area {
+            padding: 40px;
+            position: relative;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .two-columns {
+            column-count: 2;
+            column-gap: 60px;
+            position: relative;
+        }
+
+        /* Декоративная линия по центру */
+        .two-columns::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, var(--gold-color) 20%, var(--heading-color) 50%, var(--gold-color) 80%, transparent);
+            border-left: 1px solid rgba(191, 163, 95, 0.3);
+        }
+
+        .two-columns h2 {
+            font-family: 'Cinzel', serif;
+            color: var(--heading-color);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--gold-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+            column-span: all;
+        }
+
+        .two-columns p {
+            margin-bottom: 15px;
+            text-align: justify;
+            font-size: 1.05rem;
+        }
+
+        .two-columns ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .two-columns li {
+            margin-bottom: 5px;
+        }
+
+        .two-columns li::marker {
+            color: var(--heading-color);
+            font-size: 1.2rem;
+        }
+
+        blockquote {
+            font-style: italic;
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid var(--heading-color);
+            padding: 10px 20px;
+            margin: 20px 0;
+            color: #e0d6c8;
+            break-inside: avoid;
+        }
+
+        /* IMAGES IN TEXT */
+        .img-container {
+            break-inside: avoid;
+            margin: 20px auto;
+            border: 2px solid var(--gold-color);
+            padding: 5px;
+            background: #000;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+            max-width: 90%;
+            display: block;
+        }
+
+        .img-container img {
+            width: 100%;
+            display: block;
+            filter: sepia(20%) contrast(110%);
+        }
+
+        .img-caption {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            text-align: center;
+            color: var(--gold-color);
+            padding-top: 8px;
+            text-transform: uppercase;
+        }
+
+        /* ACCORDION */
+        .accordion-section {
+            margin-top: 30px;
+        }
+
+        .accordion {
+            background: linear-gradient(to right, var(--dark-red), rgba(62, 12, 12, 0.5));
+            border: 1px solid var(--gold-color);
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 15px 20px;
+            width: 100%;
+            text-align: left;
+            outline: none;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            transition: 0.4s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            break-inside: avoid;
+            margin-bottom: 5px;
+        }
+
+        .accordion:hover {
+            background: var(--heading-color);
+        }
+
+        .accordion .icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .accordion.active .icon {
+            transform: rotate(45deg);
+        }
+
+        .panel {
+            padding: 0 20px;
+            background-color: rgba(0,0,0,0.3);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+            border-left: 2px solid var(--heading-color);
+            margin-bottom: 5px;
+            font-style: italic;
+        }
+
+        .panel p {
+            margin: 15px 0;
+        }
+
+        /* DECORATIVE ELEMENTS */
+        .separator {
+            text-align: center;
+            column-span: all;
+            margin: 30px 0;
+            color: var(--gold-color);
+            font-size: 1.5rem;
+            letter-spacing: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #666;
+            border-top: 1px solid var(--dark-red);
+        }
+
+        @media (max-width: 768px) {
+            .two-columns {
+                column-count: 1;
+            }
+            .two-columns::after {
+                display: none;
+            }
+            h1 { font-size: 2.5rem; letter-spacing: 3px; }
+            .header { min-height: 50vh; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- HEADER -->
+    <header class="header">
+        <img src="https://z-cdn-media.chatglm.cn/files/271d8951-71d5-4354-8bad-d89a7fe197ce.png?auth_key=1878983374-424cf2c7134547f88e1c990a83444daf-0-4512ecbdc59dd8c4a2d8ea68a8f0d3d1" alt="Elias Vane Current" class="header-bg">
+        
+        <div class="header-content">
+            <h1>Элиас Вейн</h1>
+            <div class="subtitle">Падший миллиардер • Сатанист • Лудоман</div>
+            <div class="stats-grid">
+                <div class="stat-box">Клан: <span>Баали</span></div>
+                <div class="stat-box">Поколение: <span>7-е</span></div>
+                <div class="stat-box">Секта: <span>Анархи</span></div>
+                <div class="stat-box">Маска: <span>Бонвиван</span></div>
+                <div class="stat-box">Натура: <span>Монстр</span></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'Before')">До Становления</button>
+        <button class="tab-btn" onclick="openTab(event, 'Embrace')">Становление</button>
+        <button class="tab-btn" onclick="openTab(event, 'After')">После Становления</button>
+        <button class="tab-btn" onclick="openTab(event, 'Personal')">Личное</button>
+    </div>
+
+    <div class="content-area">
+
+        <!-- TAB 1: BEFORE EMBRACE -->
+        <div id="Before" class="tab-content active" style="display: block;">
+            <div class="two-columns">
+                <h2>Предыстория до Становления</h2>
+                <p>Элиас Вейн родился в Нью-Йорке в 1965 году, в семье людей, для которых деньги давно перестали быть целью и превратились в инструмент контроля. Его отец был финансистом с огромным количеством серых связей: политики, владельцы казино, криминальные посредники и люди, которых никогда не упоминали в газетах напрямую. Мать происходила из европейской семьи с болезненным увлечением оккультизмом и эзотерикой.</p>
+                
+                <!-- ИЗОБРАЖЕНИЕ ИЗ ДЕТСТВА -->
+                <div class="img-container">
+                    <img src="https://z-cdn-media.chatglm.cn/files/ce46b0b4-24f3-447c-a540-243a6fdeff43.png?auth_key=1878983374-55f17d84947649afab28d2613d4f8282-0-0b4f0d8cc8d175fb946c2ccac6703f94" alt="Childhood">
+                    <div class="img-caption">Детство в псевдоегипетском зале</div>
+                </div>
+
+                <p>Детство Элиаса прошло между дорогими школами, закрытыми виллами и частными островами. Родители редко занимались им лично, зато мальчик с ранних лет видел то, чего обычные дети видеть не должны. Закрытые вечеринки, странные ритуалы, взрослые люди в масках, наркотики и ощущение, что миром управляют не законы, а пороки богатых людей.</p>
+                
+                <p>Самым ярким воспоминанием детства для него стал главный зал семейного острова. Огромное бело-золотое помещение в псевдоегипетском стиле: мраморные колонны, бирюзовые стены, золотые символы, синие потолки с нарисованными звёздами и тёплый янтарный свет факелов. Позже именно в таком стиле Элиас перестроил подземный храм под островом — почти точную копию того зала из детства, только ещё более вычурную и больную.</p>
+                
+                <p>Уже подростком он стал совершенно неуправляемым. Элиас обожал азарт и быстро подсел на ощущение риска. Казино, подпольные ставки и карточные игры интересовали его куда сильнее учёбы. Он мог за ночь проиграть сумму, за которую обычный человек жил бы десятилетиями, а потом с безумной улыбкой пытаться отыграться обратно.</p>
+                
+                <p>Но дело было не в деньгах. Ему нравилось чувство вседозволенности. Нравилось смотреть, как люди ломаются из-за азарта, унижаются и теряют контроль.</p>
+                
+                <p>В университете он изучал экономику и медиа, но по-настоящему прославился благодаря скандальным вечеринкам, нелегальным трансляциям и постоянным выходкам. Вокруг Элиаса быстро собралась свита из наркоманов, тусовщиков, проституток, мелких мошенников и людей, мечтавших урвать кусок его богатства.</p>
+                
+                <div class="separator">☥ ✦ ☥</div>
+                
+                <p>С возрастом развлечений стало не хватать. Деньги, наркотики и власть перестали вызывать эмоции. Тогда Элиас начал искать что-то более экстремальное. Он увлёкся оккультизмом, финансировал сатанинские культы и коллекционировал древние тексты по демонологии.</p>
+                
+                <p>Со временем это превратилось в одержимость.</p>
+
+                <!-- ИЗОБРАЖЕНИЕ ЖИЗНИ НА ОСТРОВЕ -->
+                <div class="img-container">
+                    <img src="https://z-cdn-media.chatglm.cn/files/0ced70a0-2e84-40be-9efd-430d428a0b30.png?auth_key=1878985573-e8be0fba68d84333b36e81a991531e48-0-654841cc692002a5c3084d19d49b6df4" alt="Island Life">
+                    <div class="img-caption">Жизнь на острове и знаменитости</div>
+                </div>
+
+                <p>На своём острове он построил настоящий подземный храм. Белый мрамор, золотые символы, бирюзовые стены, статуи древних богов и длинные коридоры, освещённые красноватыми лампами и факелами. Богатые гости воспринимали всё это как очередное безумное шоу эксцентричного миллиардера.</p>
+                
+                <p>Для Элиаса же это стало попыткой достучаться до чего-то, что скрывается за пределами человеческого мира.</p>
+                
+                <p>И однажды ему ответили.</p>
+            </div>
+        </div>
+
+        <!-- TAB 2: EMBRACE -->
+        <div id="Embrace" class="tab-content">
+            <div class="two-columns">
+                <h2>Становление и Сир</h2>
+                <p>В 1998 году Элиас провёл самый масштабный ритуал в своей жизни. В подземном храме собрались десятки людей: богачи, оккультисты, наркоманы, фанатики и просто дегенераты, которым наскучили обычные человеческие удовольствия.</p>
+                <p>Ритуал длился несколько часов. В зале стоял запах крови, алкоголя и благовоний. Люди смеялись, молились и постепенно теряли контроль над собой, скатываясь в бездну животного разврата и жестокости.</p>
+                
+                <p>Кульминация церемонии превзошла все прошлые безумства. На алтаре лежала одна из жертв — маленькая девочка, замученная до смерти фанатиками. Элиас, полностью потерявший связь с реальностью, сидел перед ней. В его руках была отрубленная нога ребёнка. С остекленевшим взглядом и окровавленным ртом он буквально доедал её коленную чашечку, хрустя хрящом и упиваясь абсолютной, запредельной мерзостью происходящего.</p>
+                
+                <p>Именно в этот момент всё изменилось.</p>
+                
+                <p>Сначала погас свет. Затем остановились генераторы. Музыка оборвалась, а люди вокруг начали паниковать так резко, словно почувствовали приближение хищника.</p>
+                <p>Тогда в центре зала появился мужчина в старом чёрном костюме.</p>
+                <p>Высокий, бледный и совершенно спокойный. Он не повышал голос, но каждый человек в помещении слышал его так, будто тот стоял прямо рядом.</p>
+                <p>Незнакомец посмотрел на окровавленного Элиаса и произнёс:</p>
+                <blockquote>«Ты слишком долго звал во тьму».</blockquote>
+                <p>После этого началась бойня.</p>
+                <p>Некоторые участники ритуала сошли с ума на месте. Другие пытались бежать. Охрана открыла огонь друг по другу в полной панике. Сам Элиас позже вспоминал происходящее как кровавый сон.</p>
+                <p>Сир почти досуха выпил его кровь, а затем заставил пить свою.</p>
+                <p>Становление стало для Элиаса одновременно чудовищной агонией и самым сильным ощущением в его существовании. Он чувствовал, как что-то внутри него ломается окончательно. Как будто вся человеческая часть личности наконец сгнила до конца.</p>
+                <p>Первые недели после обращения были кошмаром. Голод сводил его с ума, а сир почти не помогал. Вместо объяснений тот наблюдал, как Элиас учится выживать среди чудовищ.</p>
+                <p>Он рассказал только самое важное:</p>
+                <ul>
+                    <li>что клан Баали ненавидят почти все Сородичи,</li>
+                    <li>что истинную природу нужно скрывать любой ценой,</li>
+                    <li>что страх полезнее уважения.</li>
+                </ul>
+                <p>Главный урок Элиас запомнил навсегда:</p>
+                <blockquote>«Баали живут дольше остальных потому, что никто не верит в их существование».</blockquote>
+                <p>Рядом с сиром он провёл около полугода. А затем тот исчез без предупреждения.</p>
+                <p>Элиас так и не узнал его настоящего имени.</p>
+            </div>
+        </div>
+
+        <!-- TAB 3: AFTER EMBRACE -->
+        <div id="After" class="tab-content">
+            <div class="two-columns">
+                <h2>Предыстория после Становления</h2>
+                <p>Пока Элиас привыкал к новой природе, его человеческая жизнь разваливалась на части.</p>
+                <p>Партнёры украли остатки активов. Счета заморозили. Остров сгорел после расследования, а бывшие друзья начали массово открещиваться от любых связей с ним. Скандалы уничтожили репутацию семьи за считанные месяцы.</p>
+                <p>К моменту окончательного исчезновения сира Элиас потерял почти всё:</p>
+                <ul>
+                    <li>деньги,</li>
+                    <li>недвижимость,</li>
+                    <li>влияние,</li>
+                    <li>политические связи,</li>
+                    <li>прежний статус.</li>
+                </ul>
+                <p>От миллиардера остались лишь фальшивые документы, пара тайников с наличкой и ненависть к собственной слабости.</p>
+                <p>В Лас-Вегас он приехал потому, что это был единственный город, который он действительно понимал. Город казино, лудоманов, мошенников и людей, готовых продать душу за ещё один шанс отыграться.</p>
+                <p>Первые месяцы в городе он буквально выживал:</p>
+                <ul>
+                    <li>играл в подпольных казино,</li>
+                    <li>жил в дешёвых мотелях,</li>
+                    <li>подделывал документы,</li>
+                    <li>воровал кровь у наркоманов и проституток.</li>
+                </ul>
+                <p>С будущей котерией анархов он познакомился случайно. Несколько молодых вампиров пытались скрыться после проваленной операции против Камарильи и наткнулись на Элиаса в подпольном казино, где тот пытался выиграть деньги на новые документы.</p>
+                <p>Они едва не сцепились, но Элиас помог им выбраться из проблемы с местной полицией и гулем Камарильи. В ответ анархи дали ему убежище и защиту.</p>
+                <p>Постепенно он стал частью котерии.</p>
+                <p>Не потому, что верил в свободу анархов. И не потому, что искал друзей.</p>
+                <p>Просто в мире Сородичей даже чудовищам иногда нужен кто-то, кто прикроет спину днём.</p>
+                <p>Никто из котерии не знает, что Элиас — Баали.</p>
+                <p>Для окружающих он просто:</p>
+                <ul>
+                    <li>бывший богач,</li>
+                    <li>странный оккультист,</li>
+                    <li>лудоман с холодным взглядом,</li>
+                    <li>полезный анарх, умеющий решать проблемы.</li>
+                </ul>
+                <p>И именно так он хочет, чтобы всё оставалось.</p>
+            </div>
+        </div>
+
+        <!-- TAB 4: PERSONAL -->
+        <div id="Personal" class="tab-content">
+            <div class="two-columns accordion-section">
+                <h2>Личные цели и Мнения</h2>
+                
+                <button class="accordion"><span>Личные цели</span><span class="icon">+</span></button>
+                <div class="panel">
+                    <p><em>Я потерял всё слишком быстро. Деньги. Имя. Влияние. Людей, которые клялись в верности, пока мои счета были открыты. Но вместе с этим я понял кое-что важное: богатство никогда не делало меня сильным. Оно просто прятало пустоту внутри. Теперь мне нужно не богатство. Мне нужно понять, зачем он выбрал именно меня.</em></p>
+                </div>
+
+                <button class="accordion"><span>Смысл не-жизни</span><span class="icon">+</span></button>
+                <div class="panel">
+                    <p><em>Когда ты человек, тебе кажется, что ты контролируешь свою жизнь. Потом приходит ночь — и выясняется, что ты был просто животным, которое научилось носить дорогой костюм. Становление ничего у меня не отняло. Оно лишь сорвало маску.</em></p>
+                </div>
+
+                <button class="accordion"><span>Отношение к Камарилье</span><span class="icon">+</span></button>
+                <div class="panel">
+                    <p><em>Камарилья напоминает старых миллиардеров, которых я знал при жизни. Те же дорогие костюмы. Те же разговоры о порядке и традициях. И тот же животный страх потерять власть. Они считают себя хозяевами мира, но я слишком хорошо знаю, как быстро рушатся империи.</em></p>
+                </div>
+
+                <button class="accordion"><span>Отношение к Анархам</span><span class="icon">+</span></button>
+                <div class="panel">
+                    <p><em>Анархи — психи, неудачники, романтики и чудовища одновременно. Но хотя бы они честнее остальных. Они не пытаются делать вид, будто мир Сородичей справедлив. Не строят из себя благородных монстров. И среди них проще прятаться.</em></p>
+                </div>
+
+                <button class="accordion"><span>Отношение к Шабашу</span><span class="icon">+</span></button>
+                <div class="panel">
+                    <p><em>Шабаш напоминает мне богатых дегенератов с моих вечеринок. Слишком громкие. Слишком одержимые собственной жестокостью. Им нравится казаться чудовищами больше, чем быть ими на самом деле. Некоторые из них действительно опасны. Большинство — просто шум.</em></p>
+                </div>
+
+                <button class="accordion"><span>Отношение к другим Баали</span><span class="icon">+</span></button>
+                <div class="panel">
+                    <p><em>Если кто-то узнает, кто я такой, мне придётся его убить. Если я встречу другого Баали — возможно, тоже. Наш клан существует только потому, что большинство вампиров считает нас страшной сказкой. И я не собираюсь разрушать эту иллюзию.</em></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        Vampire: The Masquerade v20 — Character Backstory ©
+    </footer>
+</div>
+
+<script>
+    // Tabs Logic
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).style.display = "block";
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    // Accordion Logic
+    var acc = document.getElementsByClassName("accordion");
+    for (var i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+                panel.style.padding = "0 20px";
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+                panel.style.padding = "10px 20px";
+            } 
+        });
+    }
+</script>
+
+</body>
+</html>
